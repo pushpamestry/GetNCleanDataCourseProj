@@ -1,6 +1,7 @@
 library(data.table)
 library(dplyr)
 
+#Read activity labels and feature names
 d_featuresnames <-read.table("UCI HAR Dataset/features.txt", header = FALSE)
 d_activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt", header = FALSE)
 d_activityLabels[,2] = as.character(d_activityLabels[,2])
@@ -25,7 +26,7 @@ d_featuresAll <- rbind(d_featurestrain, d_featurestest)
 #Assign column names from features.txt
 colnames(d_featuresAll) <- d_featuresnames[,2]
 
-#patch activity columns and features column
+#Merge the data for have a consolidated data set
 dt <- cbind(Activity = d_activityAll[,1],Subject = d_subjectAll[,1],d_featuresAll)
 
 #remove tables from memory that are no more required
@@ -67,7 +68,7 @@ names(dt)<-gsub("tBody", "TimeBody", names(dt))
 #List new column names
 print(names(dt))
 
-#From the data set in step 4, creates a second, independent tidy data set with the average of each variable 
+# 5 : From the data set in step 4, creates a second, independent tidy data set with the average of each variable 
 #for each activity and each subject
 
 

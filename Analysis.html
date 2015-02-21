@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Datascience Coursera : Getting and Cleaning Data - Course Project</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Datascience Coursera : Getting and Cleaning Data - Course Project</h1>
+
+<p>Repo name :  GetNCleanDataCourseProj</p>
+
+<h4>Introduction</h4>
+
+<p>Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained: </p>
+
+<p><a href="http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones">http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones</a> </p>
+
+<p>Here are the data for the project: </p>
+
+<p><a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a> </p>
+
+<h4>Goal</h4>
+
+<p>Create one R script called run_analysis.R that does the following. </p>
+
+<ul>
+<li><p>Merges the training and the test sets to create one data set.</p></li>
+<li><p>Extracts only the measurements on the mean and standard deviation for each measurement. </p></li>
+<li><p>Uses descriptive activity names to name the activities in the data set</p></li>
+<li><p>Appropriately labels the data set with descriptive variable names. </p></li>
+<li><p>From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.</p></li>
+</ul>
+
+<h5>The repository contains following files</h5>
+
+<ul>
+<li><p>run_analysis.R : R-code script for achieving project goal</p></li>
+<li><p>TidyData.txt : The tidy data extracted from the original data using run_analysis.R</p></li>
+<li><p>CodeBook.md : the CodeBook reference to the variables in TidyData.txt</p></li>
+<li><p>README.md : The script details in run_analysis.R</p></li>
+<li><p>Analysis.html : the html version of README.md</p></li>
+</ul>
+
+<h4>run_analysis.R</h4>
+
+<p>This script containts snippets for performing data merging and cleaning activities as explained the subsequent sections</p>
+
+<h5>Assumption : UCI HAR zip file is already downloaded and exctracted in the directory where run_analysis.R is placed</h5>
+
+<p>######Libraries</p>
+
+<pre><code>library(data.table)
+library(dplyr)
+</code></pre>
+
+<h5>Read text files and metadata</h5>
+
+<pre><code>#Read activity labels and feature names
+d_featuresnames &lt;-read.table(&quot;UCI HAR Dataset/features.txt&quot;, header = FALSE)
+d_activityLabels &lt;- read.table(&quot;UCI HAR Dataset/activity_labels.txt&quot;, header = FALSE)
+d_activityLabels[,2] = as.character(d_activityLabels[,2])
+
+#Read Test data
+
+d_featurestest&lt;-read.table(&quot;UCI HAR Dataset/test/X_test.txt&quot;, header = FALSE)
+d_activitytest&lt;-read.table(&quot;UCI HAR Dataset/test/Y_test.txt&quot;, header = FALSE)
+d_subject_test &lt;- read.table(&quot;UCI HAR Dataset/test/subject_test.txt&quot;, header = FALSE)
+
+#Read Train data
+
+d_featurestrain&lt;-read.table(&quot;UCI HAR Dataset/train/X_train.txt&quot;, header = FALSE)
+d_activitytrain&lt;-read.table(&quot;UCI HAR Dataset/train/Y_train.txt&quot;, header = FALSE)
+d_subject_train&lt;- read.table(&quot;UCI HAR Dataset/train/subject_train.txt&quot;, header = FALSE)
+
+
+</code></pre>
+
+<h3>1 : Merge the training and the test sets to create one data set</h3>
+
+<pre><code>d_subjectAll &lt;- rbind(d_subject_train, d_subject_test)
+d_activityAll &lt;- rbind(d_activitytrain, d_activitytest)
+d_featuresAll &lt;- rbind(d_featurestrain, d_featurestest)
+</code></pre>
+
+<h4>Assign column names from features.txt</h4>
+
+<pre><code>colnames(d_featuresAll) &lt;- d_featuresnames[,2]
+</code></pre>
+
+<h4>Merge the data for have a consolidated data set</h4>
+
+<pre><code>dt &lt;- cbind(Activity = d_activityAll[,1],Subject = d_subjectAll[,1],d_featuresAll)
+</code></pre>
+
+<h4>Remove tables from memory that are no more required</h4>
+
+<pre><code>rm(d_subjectAll)
+rm(d_activityAll)
+rm(d_featuresAll)
+rm(d_featurestest)
+rm(d_activitytest)
+rm(d_subject_test)
+rm(d_featurestrain)
+rm(d_activitytrain)
+rm(d_subject_train)
+rm(d_featuresnames)
+</code></pre>
+
+<h3>2 : Extracts only the measurements on the mean and standard deviation for each measurement</h3>
+
+<pre><code>colFilter &lt;- grep(&quot;.*std.*|.*mean.*&quot;, ignore.case=TRUE, names(dt))
+dt &lt;- data.table(dt[,c(1,2,colFilter)])
+</code></pre>
+
+<h3>3 : Use descriptive activity names to name the activities in the data set</h3>
+
+<pre><code>for (i in 1:nrow(d_activityLabels)){
+  dt$Activity[dt$Activity == i] &lt;- as.character(d_activityLabels[i,2])
+}
+</code></pre>
+
+<h3>4 : Appropriately label the data set with descriptive variable names.</h3>
+
+<pre><code>names(dt)&lt;-gsub(&quot;^t&quot;, &quot;Time&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;^f&quot;, &quot;Frequency&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;BodyBody&quot;, &quot;Body&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;-mean()&quot;, &quot;Mean&quot;, names(dt), ignore.case = TRUE)
+names(dt)&lt;-gsub(&quot;-std()&quot;, &quot;STD&quot;, names(dt), ignore.case = TRUE)
+names(dt)&lt;-gsub(&quot;-freq()&quot;, &quot;Frequency&quot;, names(dt), ignore.case = TRUE)
+names(dt)&lt;-gsub(&quot;Mag&quot;, &quot;Magnitude&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;Acc&quot;, &quot;Accelerometer&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;Gyro&quot;, &quot;Gyroscope&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;angle&quot;, &quot;Angle&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;gravity&quot;, &quot;Gravity&quot;, names(dt))
+names(dt)&lt;-gsub(&quot;tBody&quot;, &quot;TimeBody&quot;, names(dt))
+
+#List new column names
+print(names(dt))
+</code></pre>
+
+<h3>5 : From the data set in step 4, creates a second, independent tidy data set with the average of each variable  for each activity and each subject</h3>
+
+<pre><code>dt$Subject &lt;- as.factor(dt$Subject)
+
+tidyData &lt;- aggregate(. ~Subject + Activity, dt, mean)
+tidyData &lt;- tidyData[order(tidyData$Subject,tidyData$Activity),]
+write.table(tidyData, file = &quot;TidyData.txt&quot;, row.names = FALSE)
+</code></pre>
+
+</body>
+
+</html>
